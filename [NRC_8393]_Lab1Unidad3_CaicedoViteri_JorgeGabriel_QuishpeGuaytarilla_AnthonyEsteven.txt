@@ -1,0 +1,193 @@
+Create TABLE tb_persona(
+	int_index_persona NUMBER NOT NULL PRIMARY KEY,
+	str_id_persona VARCHAR2(50) NOT NULL,
+	str_nombre_persona VARCHAR2(50) NOT NULL,
+	str_apellido_persona VARCHAR2(50) NOT NULL,
+	str_fecha_nacimiento_persona VARCHAR2(50) NOT NULL,
+	int_edad_persona NUMBER
+);
+
+Create TABLE tb_estudiante
+(
+	int_index_persona NUMBER NOT NULL PRIMARY KEY,
+	str_foto_estudiante VARCHAR2(500) NOT NULL,
+	CONSTRAINT fk_persona_estudiante
+	FOREIGN KEY (int_index_persona) 
+	REFERENCES tb_persona(int_index_persona)
+);
+
+Create TABLE tb_docente
+(
+	int_index_persona NUMBER NOT NULL PRIMARY KEY,
+	str_titulo_docente VARCHAR2 (50) NOT NULL,
+	CONSTRAINT fk_persona_docente
+	FOREIGN KEY (int_index_persona) 
+	REFERENCES tb_persona(int_index_persona)
+);
+
+Create TABLE tb_representante_estudiante
+(
+	int_index_persona_estudiante NUMBER NOT NULL,
+	int_index_persona_representante NUMBER NOT NULL,
+	str_parentesco VARCHAR2 (50) NOT NULL,
+	FOREIGN KEY (int_index_persona_estudiante) REFERENCES tb_estudiante(int_index_persona),
+	FOREIGN KEY (int_index_persona_representante) REFERENCES tb_persona(int_index_persona),
+	PRIMARY KEY (int_index_persona_estudiante,int_index_persona_representante)
+);
+
+Create TABLE tb_usuario
+(
+	str_id_usuario VARCHAR2 (100) NOT NULL PRIMARY KEY,
+	str_nombre_usuario VARCHAR2 (100)NOT NULL,
+	str_password_usuario VARCHAR2 (100)NOT NULL,
+	int_index_persona NUMBER NOT NULL,
+	CONSTRAINT fk_usuario_persona
+	FOREIGN KEY (int_index_persona) 
+	REFERENCES tb_persona(int_index_persona)
+);
+
+Create TABLE tb_rol
+(
+	str_id_rol VARCHAR2 (100) NOT NULL PRIMARY KEY,
+	str_descripcion_rol VARCHAR2 (200) NOT NULL
+);
+
+Create TABLE tb_rol_usuario
+(
+	str_id_usuario VARCHAR2 (100) NOT NULL,
+	str_id_rol VARCHAR2 (100) NOT NULL,
+	CONSTRAINT fk_usuario_rol
+	FOREIGN KEY (str_id_usuario) 
+	REFERENCES tb_usuario(str_id_usuario),
+	CONSTRAINT fk_rol_usuario
+	FOREIGN KEY (str_id_rol) 
+	REFERENCES tb_rol(str_id_rol),
+	PRIMARY KEY (str_id_usuario,str_id_rol)
+);
+
+
+Create TABLE tb_anio_escolar
+(
+	str_id_anio VARCHAR2 (100) NOT NULL PRIMARY KEY,
+	str_nombre_anio VARCHAR2 (100) NOT NULL,
+	str_estado_anio VARCHAR2 (100) NOT NULL
+);
+
+Create TABLE tb_nivel
+(
+	str_id_nivel VARCHAR2 (100) NOT NULL PRIMARY KEY,
+	str_nombre_nivel VARCHAR2 (100) NOT NULL
+);
+
+Create TABLE tb_matricula
+(
+	int_index_persona NUMBER NOT NULL,
+	str_id_anio VARCHAR2 (100) NOT NULL,
+	str_id_nivel VARCHAR2 (100) NOT NULL,
+	str_estado VARCHAR2 (100) NOT NULL,
+	CONSTRAINT fk_estudiante_matricula
+	FOREIGN KEY (int_index_persona) 
+	REFERENCES tb_estudiante(int_index_persona),
+	CONSTRAINT fk_anio_matricula
+	FOREIGN KEY (str_id_anio) 
+	REFERENCES tb_anio_escolar(str_id_anio),
+	CONSTRAINT fk_nivel_matricula
+	FOREIGN KEY (str_id_nivel) 
+	REFERENCES tb_nivel(str_id_nivel),
+	PRIMARY KEY (int_index_persona,str_id_anio)
+);
+
+Create TABLE tb_materia
+(
+	str_id_materia VARCHAR2 (100) NOT NULL PRIMARY KEY,
+	str_nombre_materia VARCHAR2 (100) NOT NULL,
+	str_descripcion_materia VARCHAR2 (500) NOT NULL,
+	str_id_nivel VARCHAR2 (100) NOT NULL,
+	CONSTRAINT fk_nivel_materia
+	FOREIGN KEY (str_id_nivel) 
+	REFERENCES tb_nivel(str_id_nivel)
+);
+
+Create TABLE tb_actividad
+(
+	str_id_actividad VARCHAR2 (100) NOT NULL,
+	var_tema_actividad VARCHAR2 (200) NOT NULL,
+	str_estado_actividad VARCHAR2 (100) NOT NULL,
+	str_id_materia VARCHAR2 (100) NOT NULL,
+	CONSTRAINT fk_materia_actividad
+	FOREIGN KEY (str_id_materia) 
+	REFERENCES tb_materia(str_id_materia),
+	PRIMARY KEY (str_id_actividad,str_id_materia)
+);
+
+Create TABLE tb_libreta
+(
+	str_id_libreta VARCHAR2 (100) NOT NULL PRIMARY KEY,
+	str_nombre_libreta VARCHAR2 (500) NOT NULL,
+	str_estado_libreta VARCHAR2 (100) NOT NULL
+);
+
+Create TABLE tb_calificaciones
+(
+	str_id_materia VARCHAR2 (100) NOT NULL,
+	str_id_actividad VARCHAR2 (100) NOT NULL,
+	str_id_libreta VARCHAR2 (100) NOT NULL,
+	float_nota NUMBER NOT NULL,
+	CONSTRAINT fk_actividad_calificaciones
+	FOREIGN KEY (str_id_materia,str_id_actividad) 
+	REFERENCES tb_actividad(str_id_materia,str_id_actividad),
+	CONSTRAINT fk_libreta_calificaciones
+	FOREIGN KEY (str_id_libreta) 
+	REFERENCES tb_libreta(str_id_libreta),
+	PRIMARY KEY (str_id_materia,str_id_actividad,str_id_libreta)
+);
+
+Create TABLE tb_base_legal
+(
+	str_id_base VARCHAR2 (100) NOT NULL PRIMARY KEY,
+	str_nombre_base VARCHAR2 (100) NOT NULL,
+	str_estado_base VARCHAR2 (100) NOT NULL
+);
+
+
+Create TABLE tb_institucion
+(
+	str_id_institucion VARCHAR2 (100) PRIMARY KEY,
+	str_nombre_institucion VARCHAR2 (100) NOT NULL,
+	str_modalidad_institucion VARCHAR2 (100) NOT NULL,
+	str_jornada_institucion VARCHAR2 (100) NOT NULL,
+	str_id_base VARCHAR2 (100) NOT NULL,
+	CONSTRAINT fk_base_institucion
+	FOREIGN KEY (str_id_base)
+	REFERENCES tb_base_legal(str_id_base)
+);
+
+Create TABLE tb_aula
+(
+	str_id_aula VARCHAR2 (100) NOT NULL,
+	str_nombre_aula VARCHAR2 (100) NOT NULL,
+	str_id_institucion VARCHAR2 (100) NOT NULL,
+	CONSTRAINT fk_institucion_aula
+	FOREIGN KEY (str_id_institucion)
+	REFERENCES tb_institucion(str_id_institucion),
+	PRIMARY KEY (str_id_aula,str_id_institucion)
+);
+
+Create TABLE tb_ubicacion
+(
+	int_index_persona NUMBER NOT NULL,
+	str_id_institucion VARCHAR2 (100) NOT NULL,
+	str_id_aula VARCHAR2 (100) NOT NULL,
+	str_id_materia VARCHAR2 (100) NOT NULL,
+	str_horario VARCHAR2 (200) NOT NULL,
+	CONSTRAINT fk_aula_ubicacion
+	FOREIGN KEY (str_id_institucion,str_id_aula)
+	REFERENCES tb_aula(str_id_institucion,str_id_aula),
+	CONSTRAINT fk_docente_ubicacion
+	FOREIGN KEY (int_index_persona)
+	REFERENCES tb_docente(int_index_persona),
+	CONSTRAINT fk_materia_ubicacion
+	FOREIGN KEY (str_id_materia)
+	REFERENCES tb_materia(str_id_materia),
+	PRIMARY KEY (str_id_institucion,str_id_aula,str_id_materia,int_index_persona)
+);
